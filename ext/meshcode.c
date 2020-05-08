@@ -47,7 +47,7 @@ encode_mesh22 (int lat, int lon)
     return ( lon == 0 ) ? 3 : 4;
   }
   else {
-    rb_raise(rb_eRuntimeError, "invalid input");    
+    rb_raise(rb_eRuntimeError, "invalid inputls");    
   }
 }
 
@@ -76,6 +76,17 @@ decode_mesh22 (int code, int *lat, int *lon)
       rb_raise(rb_eRuntimeError, "invalid meshcode");
   }
 }
+
+/*
+Encodes the given (latitude, longitude, level) to meshcode.
+
+@overload encode (lat, lon, level)
+  @param lat [Numeric]
+  @param lon [Numeric]
+  @param level [Integer] meshlevel 1..6
+
+@return [String] meshcode
+*/
 
 static VALUE
 rb_meshcode_encode (VALUE self, VALUE vlat, VALUE vlon, VALUE vlevel)
@@ -161,16 +172,16 @@ rb_meshcode_encode (VALUE self, VALUE vlat, VALUE vlon, VALUE vlevel)
                  lat1, lon1, lat2, lon2, lat3, lon3);
   }
   else if ( level == 4 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i\0", 
-                 lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4);
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i\0", 
+                 lat1, lon1, lat2, lon2, lat3, lon3, code4);
   }
   else if ( level == 5 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i%1i%1i\0", 
-                 lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4, lat5, lon5);
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i\0", 
+                 lat1, lon1, lat2, lon2, lat3, lon3, code4, code5);
   }
   else if ( level == 6 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i%1i%1i%1i%1i\0", 
-                 lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4, lat5, lon5, lat6, lon6);
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i%1i\0", 
+                 lat1, lon1, lat2, lon2, lat3, lon3, code4, code5, code6);
   }
 
   return rb_str_new2(buf);
@@ -207,6 +218,15 @@ meshcode_level(int length)
   return level;
 }
 
+/*
+Guesses level of mesh from meshcode.
+
+@overload meshlevel (meshcode)
+  @param meshcode [String]
+
+@return [Integer] level
+*/
+
 static VALUE
 rb_meshcode_meshlevel (VALUE self, VALUE vmeshcode)
 {
@@ -222,6 +242,16 @@ rb_meshcode_meshlevel (VALUE self, VALUE vmeshcode)
   return INT2NUM(level);
 }
 
+/*
+Caluculate point with meshcode and (yoffset, xoffset)
+
+@overload meshpoint (meshcode, yoffset=nil, xoffset=nil)
+  @param meshcode [String]
+  @param yoffset [Numeric]
+  @param xoffset [Numeric]
+
+@return [Array] (lat, lon)
+*/
 
 static VALUE
 rb_meshcode_meshpoint (int argc, VALUE *argv, VALUE self)

@@ -1,9 +1,11 @@
 
 Gem::Specification::new do |s|
-  version = "1.0.0"
+  version = "0.9.0"
 
   files = Dir.glob("**/*") - [ 
                                Dir.glob("simple-meshcode-*.gem"), 
+                               Dir.glob("doc/**/*"), 
+                               Dir.glob("examples/**/*"), 
                              ].flatten
 
   s.platform    = Gem::Platform::RUBY
