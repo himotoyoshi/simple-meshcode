@@ -107,6 +107,10 @@ rb_meshcode_encode (VALUE self, VALUE vlat, VALUE vlon, VALUE vlevel)
   if ( level <= 0 || level >= 7 ) {
     rb_raise(rb_eArgError, "level should be in 1..6");
   }
+
+  if (lat < 0 || lat * 1.5 >= 100.0 || lon < 100 || lon >= 200) {
+    rb_raise(rb_eArgError, "coordinates out of range");
+  }
   
   lon  = lon - 100;
 
@@ -160,27 +164,27 @@ rb_meshcode_encode (VALUE self, VALUE vlat, VALUE vlon, VALUE vlevel)
   }
   
   if ( level == 1 ) {
-    sprintf(buf, "%02i%02i\0", 
+    sprintf(buf, "%02i%02i", 
                  lat1, lon1);
   }
   else if ( level == 2 ) {
-    sprintf(buf, "%02i%02i%1i%1i\0", 
+    sprintf(buf, "%02i%02i%1i%1i", 
                  lat1, lon1, lat2, lon2);
   }
   else if ( level == 3 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i\0", 
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i", 
                  lat1, lon1, lat2, lon2, lat3, lon3);
   }
   else if ( level == 4 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i\0", 
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i", 
                  lat1, lon1, lat2, lon2, lat3, lon3, code4);
   }
   else if ( level == 5 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i\0", 
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i", 
                  lat1, lon1, lat2, lon2, lat3, lon3, code4, code5);
   }
   else if ( level == 6 ) {
-    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i%1i\0", 
+    sprintf(buf, "%02i%02i%1i%1i%1i%1i%1i%1i%1i", 
                  lat1, lon1, lat2, lon2, lat3, lon3, code4, code5, code6);
   }
 
@@ -279,6 +283,32 @@ rb_meshcode_meshpoint (int argc, VALUE *argv, VALUE self)
 
   if ( ! level ) {
     rb_raise(rb_eArgError, "invalid meshcode length");
+  }
+
+  /* メッシュコード文字列のバリデーション
+  位置 0-3: '0'〜'9'（1次メッシュの緯度・経度コード）
+  位置 4-5: '0'〜'7'（2次メッシュの8分割）
+  位置 6-7: '0'〜'9'（3次メッシュの10分割）
+  位置 8-10: '1'〜'4'（4〜6次メッシュの2×2分割コード）
+  */
+  {
+    int i;
+    for (i = 0; i < 4; i++) {
+      if (mc[i] < '0' || mc[i] > '9')
+        rb_raise(rb_eArgError, "invalid character in meshcode");
+    }
+    if (level >= 2) {
+      if (mc[4] < '0' || mc[4] > '7' || mc[5] < '0' || mc[5] > '7')
+        rb_raise(rb_eArgError, "invalid character in meshcode");
+    }
+    if (level >= 3) {
+      if (mc[6] < '0' || mc[6] > '9' || mc[7] < '0' || mc[7] > '9')
+        rb_raise(rb_eArgError, "invalid character in meshcode");
+    }
+    for (i = 8; i < length; i++) {
+      if (mc[i] < '1' || mc[i] > '4')
+        rb_raise(rb_eArgError, "invalid character in meshcode");
+    }
   }
 
   if ( level >= 1 ) {
