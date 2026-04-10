@@ -23,6 +23,36 @@ Meshcode::THIRD.to_i                        #=> 3
 `to_int` を定義すれば既存の `Meshcode.meshcode(lat, lon, Meshcode::THIRD)` も
 そのまま動く (C拡張の NUM2INT が自動変換する)。
 
+実装イメージ:
+
+```ruby
+class MeshLevel
+  attr_reader :level
+
+  def initialize(level)
+    @level = level
+  end
+
+  def to_i    = @level
+  def to_int  = @level  # NUM2INT 互換
+
+  def encode(lat, lon)
+    Meshcode.meshcode(lat, lon, @level)
+  end
+
+  def decode(meshcode, yoffset = 0, xoffset = 0)
+    Meshcode.meshpoint(meshcode, yoffset, xoffset)
+  end
+end
+
+FIRST          = MeshLevel.new(1)
+SECOND         = MeshLevel.new(2)
+THIRD          = MeshLevel.new(3)
+FOURTH_HALF    = MeshLevel.new(4)
+FOURTH_QUARTER = MeshLevel.new(5)
+FOURTH_EIGHTH  = MeshLevel.new(6)
+```
+
 ## 未対応メッシュ種別
 
 JIS X 0410 で定義されているが未対応のメッシュ:
