@@ -15,8 +15,8 @@ Gem::Specification::new do |s|
     Japan Regional Meshcode
   HERE
   s.version     = version
-  s.author      = "Hiroki Motoyoshi"
-  s.email       = ""
+  s.authors      = ["himotoyoshi"]
+  s.email       = ["himotoyoshi@users.noreply.github.com"]
   s.homepage    = 'https://github.com/himotoyoshi/simple-meshcode'
   s.files       = files
   s.extensions  = [ "ext/extconf.rb" ]
