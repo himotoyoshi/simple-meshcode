@@ -260,7 +260,8 @@ Caluculate point with meshcode and (yoffset, xoffset)
 static VALUE
 rb_meshcode_meshpoint (int argc, VALUE *argv, VALUE self)
 {
-  volatile VALUE vmeshcode, vyoffset, vxoffset;
+  volatile VALUE vmeshcode;
+  VALUE vmeshcode_arg, vyoffset, vxoffset;
   int level, length;
   double xoffset, yoffset;
   char *mc;
@@ -270,7 +271,8 @@ rb_meshcode_meshpoint (int argc, VALUE *argv, VALUE self)
   double lat, lon;
   char buf[3];
   
-  rb_scan_args(argc, argv, "12", &vmeshcode, &vyoffset, &vxoffset);
+  rb_scan_args(argc, argv, "12", &vmeshcode_arg, &vyoffset, &vxoffset);
+  vmeshcode = vmeshcode_arg;
 
   Check_Type(vmeshcode, T_STRING);
 
